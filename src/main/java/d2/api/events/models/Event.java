@@ -1,6 +1,8 @@
 package d2.api.events.models;
 
 import d2.api.events.models.location.Location;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -13,30 +15,51 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date start_date;
+    private String name;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date end_date;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private String start_date;
 
-    private Location location;
+//    @Temporal(TemporalType.TIMESTAMP)
+    private String end_date;
+
+    private String location;
     private String photoUrl;
     private String description;
-    private User created_by;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id")
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Long created_by;
 
     public Event() {
         super();
     }
 
-    public Event(Long id, Date start_date, Date end_date, Location location, String photoUrl, String description, User created_by) {
+    public Event(Long id, String name, String start_date, String end_date, String location, String photoUrl, String description, Long created_by) {
         super();
         this.id = id;
+        this.name = name;
         this.start_date = start_date;
         this.end_date = end_date;
         this.location = location;
         this.photoUrl = photoUrl;
         this.description = description;
         this.created_by = created_by;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", start_date=" + start_date +
+                ", end_date=" + end_date +
+                ", location='" + location + '\'' +
+                ", photoUrl='" + photoUrl + '\'' +
+                ", description='" + description + '\'' +
+                ", created_by=" + created_by +
+                '}';
     }
 
     public Long getId() {
@@ -47,27 +70,35 @@ public class Event {
         this.id = id;
     }
 
-    public Date getStart_date() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getStart_date() {
         return start_date;
     }
 
-    public void setStart_date(Date start_date) {
+    public void setStart_date(String start_date) {
         this.start_date = start_date;
     }
 
-    public Date getEnd_date() {
+    public String getEnd_date() {
         return end_date;
     }
 
-    public void setEnd_date(Date end_date) {
+    public void setEnd_date(String end_date) {
         this.end_date = end_date;
     }
 
-    public Location getLocation() {
+    public String getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(String location) {
         this.location = location;
     }
 
@@ -87,11 +118,11 @@ public class Event {
         this.description = description;
     }
 
-    public User getCreated_by() {
+    public Long getCreated_by() {
         return created_by;
     }
 
-    public void setCreated_by(User created_by) {
+    public void setCreated_by(Long created_by) {
         this.created_by = created_by;
     }
 }

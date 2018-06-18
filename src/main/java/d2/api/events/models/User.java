@@ -1,6 +1,7 @@
 package d2.api.events.models;
 
 import d2.api.events.enums.AccountStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 
@@ -63,7 +64,7 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = new BCryptPasswordEncoder().encode(password);
     }
 
     public AccountStatus getAccountStatus() {
