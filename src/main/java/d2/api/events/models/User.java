@@ -14,10 +14,9 @@ public class User {
 
     private String displayName;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     private AccountStatus accountStatus = AccountStatus.ENABLED;
@@ -26,13 +25,12 @@ public class User {
         super();
     }
 
-    public User(Long id, String displayName, String email, String password, AccountStatus accountStatus) {
+    public User(Long id, String displayName, String email, String password) {
         super();
         this.id = id;
         this.displayName = displayName;
         this.email = email;
         this.password = password;
-        this.accountStatus = accountStatus;
     }
 
     public Long getId() {

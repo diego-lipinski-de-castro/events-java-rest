@@ -2,17 +2,17 @@ package d2.api.events.enums;
 
 public enum AccountStatus {
 
-    ENABLED("Ativada"),
-    DISABLED("Desativada"),
-    BLOCKED("Bloqueada");
+    ENABLED(1),
+    DISABLED(0),
+    BLOCKED(-1);
 
-    private String status;
+    private int status;
 
-    AccountStatus(String status) {
+    AccountStatus(int status) {
         this.status = status;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return this.status;
     }
 }
