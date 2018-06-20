@@ -21,16 +21,23 @@ public class User {
 
     private AccountStatus accountStatus = AccountStatus.ENABLED;
 
-    public User() {
-        super();
-    }
+    public User() { }
 
-    public User(Long id, String displayName, String email, String password) {
-        super();
-        this.id = id;
+    public User(String displayName, String email, String password) {
         this.displayName = displayName;
         this.email = email;
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", displayName='" + displayName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", accountStatus=" + accountStatus +
+                '}';
     }
 
     public Long getId() {

@@ -1,7 +1,9 @@
 package d2.api.events.services;
 
 import d2.api.events.models.Event;
+import d2.api.events.models.User;
 import d2.api.events.repositories.EventsRepository;
+import d2.api.events.repositories.UsersRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "events")
+@RequestMapping(path = "/events")
 public class EventService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventService.class);
@@ -22,7 +24,9 @@ public class EventService {
     @Autowired
     private EventsRepository eventsRepository;
 
-    @GetMapping(path = "/")
+    private UserService userService;
+
+    @GetMapping
     public ResponseEntity<List<Event>> index() {
         LOG.info("GET - INDEX");
         return new ResponseEntity<>(eventsRepository.findAll(), HttpStatus.OK);
@@ -36,7 +40,7 @@ public class EventService {
         ).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
-    @PostMapping(path = "/")
+    @PostMapping
     public ResponseEntity<Event> store(@Valid @RequestBody Event event) {
         LOG.info("POST - STORE - DATA: " + event.toString());
         return new ResponseEntity<>(eventsRepository.save(event), HttpStatus.OK);

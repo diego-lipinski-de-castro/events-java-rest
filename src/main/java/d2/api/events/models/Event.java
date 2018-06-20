@@ -1,6 +1,6 @@
 package d2.api.events.models;
 
-import d2.api.events.models.location.Location;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -17,28 +17,26 @@ public class Event {
 
     private String name;
 
-//    @Temporal(TemporalType.TIMESTAMP)
-    private String start_date;
+//    need to set up offset
+    @JsonFormat(pattern = "dd/MM/y HH:mm")
+    private Date start_date;
 
-//    @Temporal(TemporalType.TIMESTAMP)
-    private String end_date;
+//    need to set up offset
+    @JsonFormat(pattern = "dd/MM/y HH:mm")
+    private Date end_date;
 
     private String location;
     private String photoUrl;
     private String description;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id")
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Long created_by;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User created_by;
 
-    public Event() {
-        super();
-    }
+    public Event() { }
 
-    public Event(Long id, String name, String start_date, String end_date, String location, String photoUrl, String description, Long created_by) {
-        super();
-        this.id = id;
+    public Event(String name, Date start_date, Date end_date, String location, String photoUrl, String description, User created_by) {
         this.name = name;
         this.start_date = start_date;
         this.end_date = end_date;
@@ -78,19 +76,19 @@ public class Event {
         this.name = name;
     }
 
-    public String getStart_date() {
+    public Date getStart_date() {
         return start_date;
     }
 
-    public void setStart_date(String start_date) {
+    public void setStart_date(Date start_date) {
         this.start_date = start_date;
     }
 
-    public String getEnd_date() {
+    public Date getEnd_date() {
         return end_date;
     }
 
-    public void setEnd_date(String end_date) {
+    public void setEnd_date(Date end_date) {
         this.end_date = end_date;
     }
 
@@ -118,11 +116,11 @@ public class Event {
         this.description = description;
     }
 
-    public Long getCreated_by() {
+    public User getCreated_by() {
         return created_by;
     }
 
-    public void setCreated_by(Long created_by) {
+    public void setCreated_by(User created_by) {
         this.created_by = created_by;
     }
 }
