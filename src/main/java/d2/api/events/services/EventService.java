@@ -1,9 +1,11 @@
 package d2.api.events.services;
 
-import d2.api.events.enums.PromotionType;
 import d2.api.events.models.Event;
+import d2.api.events.models.EventPromotion;
 import d2.api.events.models.Promotion;
+import d2.api.events.repositories.EventsPromotionsRepository;
 import d2.api.events.repositories.EventsRepository;
+import d2.api.events.repositories.PromotionsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -24,6 +25,12 @@ public class EventService {
 
     @Autowired
     private EventsRepository eventsRepository;
+
+    @Autowired
+    private PromotionsRepository promotionsRepository;
+
+    @Autowired
+    private EventsPromotionsRepository eventsPromotionsRepository;
 
     @GetMapping
     public ResponseEntity<List<Event>> index() {
@@ -67,11 +74,15 @@ public class EventService {
         }).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
-    @PostMapping(path = "/{id}/promotions/")
-    public ResponseEntity<?> promo(@PathVariable Long id, @RequestParam List<Promotion> promotionList) {
-        return eventsRepository.findById(id).map(event -> {
-            event.addPromotions(promotionList);
-            return new ResponseEntity<>(eventsRepository.save(event), HttpStatus.OK);
-        }).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+    @PostMapping(path = "/{eventId}/promote/{promotionId}")
+    public ResponseEntity<?> promote(@PathVariable Long eventId, @PathVariable Long promotionId) {
+        LOG.info("POST - PROMOTE - DATA: " + eventId + " /// " +promotionId);
+
+        Event event = eventsRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+        Promotion promotion = promotionsRepository.findById(promotionId).orElseThrow(() -> new ResourceNotFoundException("Promotion not found"));
+
+        eventsPromotionsRepository.save(new EventPromotion(event, promotion));
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -38,10 +39,21 @@ public class UserService {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody User requestUser) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody User requestUser) {
+
         return usersRepository.findById(id).map(user -> {
+
+            Optional<User> userEmail = usersRepository.findByEmail(requestUser.getEmail());
+
+            if(userEmail.isPresent() && !userEmail.get().getId().equals(requestUser.getId())) {
+                return new ResponseEntity<>("Email already in use.", HttpStatus.FORBIDDEN);
+            }
+
+            user.setEmail(requestUser.getEmail());
             user.setDisplayName(requestUser.getDisplayName());
+
             return new ResponseEntity<>(usersRepository.save(user), HttpStatus.OK);
+
         }).orElseThrow(() -> new ResourceNotFoundException("User not found."));
     }
 

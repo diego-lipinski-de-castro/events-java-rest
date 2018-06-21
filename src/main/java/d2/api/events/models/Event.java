@@ -1,14 +1,12 @@
 package d2.api.events.models;
 
 import com.fasterxml.jackson.annotation.*;
-import d2.api.events.enums.PromotionType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -42,16 +40,10 @@ public class Event {
     @Cascade(org.hibernate.annotations.CascadeType.DETACH)
     private User created_by;
 
-    @ManyToMany(
-            mappedBy = "events",
-            fetch = FetchType.EAGER,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-    )
-    private List<Promotion> promotions;
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = EventPromotion.class)
+    private List<EventPromotion> eventPromotions;
 
-    public Event() {
-        this.promotions = new ArrayList<>();
-    }
+    public Event() { }
 
     public Event(String name, Date start_date, Date end_date, String location, String photoUrl, String description, User created_by) {
         super();
@@ -62,6 +54,7 @@ public class Event {
         this.photoUrl = photoUrl;
         this.description = description;
         this.created_by = created_by;
+        this.eventPromotions = new ArrayList<>();
     }
 
     @Override
@@ -142,19 +135,23 @@ public class Event {
         this.created_by = created_by;
     }
 
-    public List<Promotion> getPromotions() {
-        return promotions;
+    public List<EventPromotion> getEventPromotions() {
+        return eventPromotions;
     }
 
-    public void addPromotions(List<Promotion> promotions) {
-        this.promotions.addAll(promotions);
+    public void addEventPromotion(EventPromotion promotion) {
+        this.eventPromotions.add(promotion);
     }
 
-    public void removePromotion(Promotion promotion) {
-        this.promotions.remove(promotion);
+    public void addEventPromotions(List<EventPromotion> eventPromotions) {
+        this.eventPromotions.addAll(eventPromotions);
+    }
+
+    public void removePromotion(EventPromotion promotion) {
+        this.eventPromotions.remove(promotion);
     }
 
     public void removeAllPromotions() {
-        this.promotions.clear();
+        this.eventPromotions.clear();
     }
 }

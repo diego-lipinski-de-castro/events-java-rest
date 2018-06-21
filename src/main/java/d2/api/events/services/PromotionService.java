@@ -45,6 +45,12 @@ public class PromotionService {
     @PutMapping(path = "/{id}")
     public ResponseEntity<Promotion> update(@PathVariable Long id, @Valid @RequestBody Promotion requestPromotion) {
         return promotionsRepository.findById(id).map(promotion -> {
+            promotion.setLabel(requestPromotion.getLabel());
+            promotion.setDuration(requestPromotion.getDuration());
+            promotion.setPrice(requestPromotion.getPrice());
+            promotion.setAvailable_from(requestPromotion.getAvailable_from());
+            promotion.setAvailable_to(requestPromotion.getAvailable_to());
+            promotion.setDescription(requestPromotion.getDescription());
             return new ResponseEntity<>(promotionsRepository.save(promotion), HttpStatus.OK);
         }).orElseThrow(() -> new ResourceNotFoundException("Promotion not found"));
     }
