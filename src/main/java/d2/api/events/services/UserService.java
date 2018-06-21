@@ -2,19 +2,15 @@ package d2.api.events.services;
 
 import d2.api.events.models.User;
 import d2.api.events.repositories.UsersRepository;
-import jdk.management.resource.ResourceRequestDeniedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -60,10 +56,17 @@ public class UserService {
     @PostMapping(path = "/login")
     public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
         return usersRepository.findByEmail(email).map(user -> {
-            if(new BCryptPasswordEncoder().matches(password, user.getPassword())) {
+            if(user.matchesPassword(password)) {
                 return new ResponseEntity<>(user, HttpStatus.OK);
             }
             throw new ResourceNotFoundException("Password does not match.");
         }).orElseThrow(() -> new ResourceNotFoundException("Email not found."));
+    }
+
+    @GetMapping(path = "/{id}/events")
+    public ResponseEntity<?> userEvents(@PathVariable Long id) {
+        return usersRepository.findById(id).map(user ->
+                new ResponseEntity<>(user.getEvents(), HttpStatus.OK)
+        ).orElseThrow(() -> new ResourceNotFoundException("User not found."));
     }
 }

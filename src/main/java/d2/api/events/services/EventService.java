@@ -1,9 +1,9 @@
 package d2.api.events.services;
 
+import d2.api.events.enums.PromotionType;
 import d2.api.events.models.Event;
-import d2.api.events.models.User;
+import d2.api.events.models.Promotion;
 import d2.api.events.repositories.EventsRepository;
-import d2.api.events.repositories.UsersRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -23,8 +24,6 @@ public class EventService {
 
     @Autowired
     private EventsRepository eventsRepository;
-
-    private UserService userService;
 
     @GetMapping
     public ResponseEntity<List<Event>> index() {
@@ -48,7 +47,6 @@ public class EventService {
 
     @PutMapping(path = "/{id}")
     public ResponseEntity<Event> update(@PathVariable Long id, @Valid @RequestBody Event requestEvent) {
-        LOG.info("PUT - UPDATE- DATA: " + id + " /// " + requestEvent.toString());
         return eventsRepository.findById(id).map(event -> {
             event.setName(requestEvent.getName());
             event.setStart_date(requestEvent.getStart_date());
@@ -69,4 +67,11 @@ public class EventService {
         }).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
     }
 
+    @PostMapping(path = "/{id}/promotions/")
+    public ResponseEntity<?> promo(@PathVariable Long id, @RequestParam List<Promotion> promotionList) {
+        return eventsRepository.findById(id).map(event -> {
+            event.addPromotions(promotionList);
+            return new ResponseEntity<>(eventsRepository.save(event), HttpStatus.OK);
+        }).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+    }
 }

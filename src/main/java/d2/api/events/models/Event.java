@@ -1,11 +1,16 @@
 package d2.api.events.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
+import d2.api.events.enums.PromotionType;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -13,6 +18,7 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     private String name;
@@ -29,14 +35,26 @@ public class Event {
     private String photoUrl;
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Cascade(org.hibernate.annotations.CascadeType.DETACH)
     private User created_by;
 
-    public Event() { }
+    @ManyToMany(
+            mappedBy = "events",
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    private List<Promotion> promotions;
+
+    public Event() {
+        this.promotions = new ArrayList<>();
+    }
 
     public Event(String name, Date start_date, Date end_date, String location, String photoUrl, String description, User created_by) {
+        super();
         this.name = name;
         this.start_date = start_date;
         this.end_date = end_date;
@@ -122,5 +140,21 @@ public class Event {
 
     public void setCreated_by(User created_by) {
         this.created_by = created_by;
+    }
+
+    public List<Promotion> getPromotions() {
+        return promotions;
+    }
+
+    public void addPromotions(List<Promotion> promotions) {
+        this.promotions.addAll(promotions);
+    }
+
+    public void removePromotion(Promotion promotion) {
+        this.promotions.remove(promotion);
+    }
+
+    public void removeAllPromotions() {
+        this.promotions.clear();
     }
 }
