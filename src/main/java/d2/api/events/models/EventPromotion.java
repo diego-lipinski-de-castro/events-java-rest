@@ -3,29 +3,25 @@ package d2.api.events.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "events_promotions")
-public class EventPromotion implements Serializable {
+public class EventPromotion {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @EmbeddedId
+    private EventPromotionEmb id;
 
-//    @Id
-    @ManyToOne
-    @JoinColumn(name = "event_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("event")
     private Event event;
 
-//    @Id
-    @ManyToOne
-    @JoinColumn(name = "promotion_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("promotion")
     private Promotion promotion;
 
     @JsonFormat(pattern = "dd/MM/y HH:mm")
-    private Date applied_date = new Date();
+    private Date applied_at = new Date();
 
     public EventPromotion() { }
 
@@ -34,20 +30,11 @@ public class EventPromotion implements Serializable {
         this.promotion = promotion;
     }
 
-    @Override
-    public String toString() {
-        return "EventPromotion{" +
-                "event=" + event +
-                ", promotion=" + promotion +
-                ", applied_date=" + applied_date +
-                '}';
-    }
-
-    public Long getId() {
+    public EventPromotionEmb getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(EventPromotionEmb id) {
         this.id = id;
     }
 
@@ -67,11 +54,11 @@ public class EventPromotion implements Serializable {
         this.promotion = promotion;
     }
 
-    public Date getApplied_date() {
-        return applied_date;
+    public Date getApplied_at() {
+        return applied_at;
     }
 
-    public void setApplied_date(Date applied_date) {
-        this.applied_date = applied_date;
+    public void setApplied_at(Date applied_at) {
+        this.applied_at = applied_at;
     }
 }

@@ -1,13 +1,11 @@
 package d2.api.events.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "promotions")
@@ -31,9 +29,8 @@ public class Promotion {
 
     private String description;
 
-//    @JsonIgnore
-    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = EventPromotion.class)
-    private List<EventPromotion> eventPromotions;
+    @OneToMany(mappedBy = "promotion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventPromotion> events = new ArrayList<>();
 
     public Promotion() { }
 
@@ -114,15 +111,29 @@ public class Promotion {
         this.description = description;
     }
 
-    public List<EventPromotion> getEventPromotions() {
-        return eventPromotions;
+    public List<EventPromotion> getEvents() {
+        return events;
     }
 
-    public void setEventPromotions(List<EventPromotion> eventPromotions) {
-        this.eventPromotions = eventPromotions;
+    public void addEvent(Event event) {
+        EventPromotion eventPromotion = new EventPromotion(event, this);
+        events.add(eventPromotion);
+        event.getPromotions().add(eventPromotion);
     }
 
-    public void addEventPromotion(EventPromotion eventPromotion) {
-        this.eventPromotions.add(eventPromotion);
+    public void removeEvent(Event event) {
+//        events.remove(event);
+//        event.getPromotions().remove(this);
+
+        for(Iterator<EventPromotion> iterator = events.iterator(); iterator.hasNext();) {
+            EventPromotion eventPromotion = iterator.next();
+
+            if(eventPromotion.getPromotion().equals(this) && eventPromotion.getEvent().equals(event)) {
+                iterator.remove();
+                eventPromotion.getEvent().getPromotions().remove(eventPromotion);
+                eventPromotion.setPromotion(null);
+                eventPromotion.setEvent(null);
+            }
+        }
     }
 }

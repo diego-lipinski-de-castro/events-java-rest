@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 @Entity
@@ -40,8 +41,8 @@ public class Event {
     @Cascade(org.hibernate.annotations.CascadeType.DETACH)
     private User created_by;
 
-    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = EventPromotion.class)
-    private List<EventPromotion> eventPromotions;
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EventPromotion> promotions = new ArrayList<>();
 
     public Event() { }
 
@@ -54,7 +55,6 @@ public class Event {
         this.photoUrl = photoUrl;
         this.description = description;
         this.created_by = created_by;
-        this.eventPromotions = new ArrayList<>();
     }
 
     @Override
@@ -135,23 +135,30 @@ public class Event {
         this.created_by = created_by;
     }
 
-    public List<EventPromotion> getEventPromotions() {
-        return eventPromotions;
+    public List<EventPromotion> getPromotions() {
+        return promotions;
     }
 
-    public void addEventPromotion(EventPromotion promotion) {
-        this.eventPromotions.add(promotion);
+    public void addPromotion(Promotion promotion) {
+        EventPromotion eventPromotion = new EventPromotion(this, promotion);
+        promotions.add(eventPromotion);
+        promotion.getEvents().add(eventPromotion);
     }
 
-    public void addEventPromotions(List<EventPromotion> eventPromotions) {
-        this.eventPromotions.addAll(eventPromotions);
-    }
+    public void removePromotion(Promotion promotion) {
+//        promotions.remove(promotion);
+//        promotion.getEvents().remove(this);
 
-    public void removePromotion(EventPromotion promotion) {
-        this.eventPromotions.remove(promotion);
-    }
+        for(Iterator<EventPromotion> iterator = promotions.iterator(); iterator.hasNext();) {
+            EventPromotion eventPromotion = iterator.next();
 
-    public void removeAllPromotions() {
-        this.eventPromotions.clear();
+            if(eventPromotion.getEvent().equals(this) && eventPromotion.getPromotion().equals(promotion)) {
+                iterator.remove();
+                eventPromotion.getPromotion().getEvents().remove(eventPromotion);
+                eventPromotion.setEvent(null);
+                eventPromotion.setPromotion(null);
+            }
+        }
+
     }
 }

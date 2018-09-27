@@ -1,9 +1,7 @@
 package d2.api.events.services;
 
 import d2.api.events.models.Event;
-import d2.api.events.models.EventPromotion;
 import d2.api.events.models.Promotion;
-import d2.api.events.repositories.EventsPromotionsRepository;
 import d2.api.events.repositories.EventsRepository;
 import d2.api.events.repositories.PromotionsRepository;
 import org.slf4j.Logger;
@@ -28,9 +26,6 @@ public class EventService {
 
     @Autowired
     private PromotionsRepository promotionsRepository;
-
-    @Autowired
-    private EventsPromotionsRepository eventsPromotionsRepository;
 
     @GetMapping
     public ResponseEntity<List<Event>> index() {
@@ -81,8 +76,10 @@ public class EventService {
         Event event = eventsRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         Promotion promotion = promotionsRepository.findById(promotionId).orElseThrow(() -> new ResourceNotFoundException("Promotion not found"));
 
-        eventsPromotionsRepository.save(new EventPromotion(event, promotion));
+        event.addPromotion(promotion);
 
-        return ResponseEntity.ok().build();
+        eventsRepository.save(event);
+
+        return new ResponseEntity<>(event, HttpStatus.OK);
     }
 }
